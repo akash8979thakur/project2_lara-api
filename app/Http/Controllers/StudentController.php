@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Student;
+use Illuminate\Support\Facades\Validator;
+
+
 class StudentController extends Controller
 {
     //
@@ -12,16 +15,31 @@ class StudentController extends Controller
     }
        
     function addStudent(Request $request){
-        $student = new Student();
-        $student->name=$request->name;
-        $student->email=$request->email;
-        $student->phone=$request->phone;
-        $student->save();
-       if($student->save()){
-        return ["student" => "student added successfully"];
-       }else{
-        return ["student" => "Failed to add student"];
-       }
+        $rules= array(
+            'name'=>'required | min:2 | max:10',
+            'email'=>'email | required',
+            'phone'=>'required  |min:10 | max:10',
+        );
+
+        // HOW TO USE VALIDATION API 
+        $validation = Validator::make($request->all(), $rules);
+
+        if ($validation->fails()){
+            return $validation->errors();
+        }else {
+
+            $student = new Student();
+            $student->name=$request->name;
+            $student->email=$request->email;
+            $student->phone=$request->phone;
+            $student->save();
+           if($student->save()){
+            return ["student" => "student added successfully"];
+           }else{
+            return ["student" => "Failed to add student"];
+           }
+        }
+       
      }
 
 
@@ -57,5 +75,8 @@ class StudentController extends Controller
             return ['return'=>'No results found'];
         }
      }
+
+
+     
     
 }
